@@ -1,0 +1,10 @@
+{
+  "title": "后端验证文章：渲染与接口联调",
+  "slug": "backend-verify-2026",
+  "summary": "用于后端端到端验证的示例文章。",
+  "content_md": "# 标题一\n\n这是一段**加粗**与*斜体*的中文正文，用来验证 goldmark + chroma + bluemonday 渲染链路是否正常。\n\n## 代码块\n\n```go\nfunc main() {\n\tfmt.Println(\"hello blog\")\n}\n```\n\n- 列表项甲\n- 列表项乙\n\n> 引用一句话。",
+  "cover_url": "",
+  "comment_enabled": true,
+  "tags": ["后端", "验证"],
+  "publish": false
+}

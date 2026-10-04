@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@import "./chroma.css";
+@import "./prose.css";
+
+/* Tailwind v4：class 策略的暗色模式必须显式声明这个变体 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * 把语义变量桥接成 Tailwind 的颜色工具类。
+ *
+ * 用 @theme inline 而不是 @theme：inline 模式下工具类会直接内联 var(--bg)
+ * 引用，因此 .dark 里改变量值时 bg-bg / text-fg 会自动跟着切换。
+ * 若用普通 @theme，工具类会把值拷贝一份，切主题就不生效了。
+ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+}
+
+/*
+ * 语义化色板。
+ *
+ * 约定：组件里一律通过 var(--xxx) 取色，**禁止硬编码颜色值**。
+ * 新增主题色时只改这里，不要散落到各个组件 —— 这是暗色模式能不能
+ * 长期维护下去的分水岭（见设计文档 §6.5）。
+ */
+:root {
+  --bg: oklch(98.5% 0.004 260);
+  --bg-subtle: oklch(96.5% 0.006 260);
+  --card: oklch(100% 0 0);
+  --fg: oklch(21% 0.02 265);
+  --fg-muted: oklch(50% 0.02 265);
+  --border: oklch(90% 0.01 260);
+  --accent: oklch(55% 0.19 260);
+  --accent-fg: oklch(98% 0.01 260);
+}
+
+.dark {
+  --bg: oklch(17% 0.015 265);
+  --bg-subtle: oklch(21% 0.018 265);
+  --card: oklch(21% 0.018 265);
+  --fg: oklch(93% 0.01 265);
+  --fg-muted: oklch(68% 0.015 265);
+  --border: oklch(30% 0.015 265);
+  --accent: oklch(72% 0.15 260);
+  --accent-fg: oklch(17% 0.02 265);
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+}
+
+/*
+ * 暗色下白底截图/图表会很刺眼，文章正文里的配图做轻微衰减。
+ * 用户可通过 body.no-image-dim 关掉这个行为。
+ */
+@media (prefers-color-scheme: dark) {
+  .dark .prose-custom img:not(.no-dim) {
+    filter: brightness(0.85) contrast(0.95);
+  }
+}
+
+/* 表单输入的统一样式（后台元数据面板复用） */
+.input {
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 0.5rem 0.75rem;
+  color: var(--fg);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: var(--accent);
+}
+.input::placeholder {
+  color: var(--fg-muted);
+}

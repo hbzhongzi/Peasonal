@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>个人博客</title>
+
+    <!--
+      主题初始化脚本：必须在 <head> 里同步执行。
+
+      这是暗色模式「首屏不闪白」的唯一正确做法 —— 如果把主题判断放进
+      React 的 useEffect，首次渲染时 <html> 还没有 dark class，用户会看到
+      一帧白底再变暗。放在这里，React 挂载前 class 就已经打好了。
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('blog-theme')
+          var mode = stored === 'light' || stored === 'dark' ? stored : 'system'
+          var isDark =
+            mode === 'dark' ||
+            (mode === 'system' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.classList.toggle('dark', isDark)
+          document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
+        } catch (e) {
+          /* localStorage 不可用时退化为亮色，不影响渲染 */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
