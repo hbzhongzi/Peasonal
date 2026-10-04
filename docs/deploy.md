@@ -1,7 +1,9 @@
 # 部署文档 · 个人博客（Docker Compose + Caddy）
 
+> **文档状态说明（2026-10-04）**：本文是早期部署方案记录。当前可直接执行的线上手册是 [`docker-production-deploy.md`](./docker-production-deploy.md)，配套配置已落在仓库根目录的 `Dockerfile`、`docker-compose.prod.yml`、`Caddyfile` 和 `.dockerignore`。本文中的旧版配置片段不要直接复制到生产环境。
+
 > 适用：把本博客部署到一台 Linux 云主机（已确认 **4 核 4G**），对外只暴露 80/443，数据库与后端都在内网。
-> 本文是**可照做的操作手册**。配套配置文件（Dockerfile / docker-compose.yml / Caddyfile / .env 模板）全文见 §6，可直接复制到仓库根使用。
+> 本文是**早期方案记录**，不是当前生产配置的唯一入口。当前可执行手册与仓库根配置见 [`docker-production-deploy.md`](./docker-production-deploy.md)。
 > 关联设计：技术方案 §9、附录 C（容量/MySQL 参数）、附录 D（Compose 方案）。
 
 ---

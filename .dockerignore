@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.workbuddy
+data
+bin
+web/node_modules
+web/dist
+*.exe
+docs
+testdata

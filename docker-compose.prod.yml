@@ -1,0 +1,97 @@
+name: personal-blog
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-blog}
+      MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
+    command:
+      - --ngram_token_size=2
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    expose:
+      - "3306"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    mem_limit: 2g
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      target: app
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    expose:
+      - "8080"
+    volumes:
+      - uploads:/srv/uploads
+    mem_limit: 256m
+    restart: unless-stopped
+
+  caddy:
+    build:
+      context: .
+      target: caddy
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?SITE_DOMAIN is required}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL is required}
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - uploads:/srv/uploads:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+  # 运维命令容器：只在显式执行时运行，不随 up 自动启动。
+  migrate:
+    profiles: [ops]
+    build:
+      context: .
+      target: migrate
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: ["-cmd", "up"]
+    restart: "no"
+
+  boot:
+    profiles: [ops]
+    build:
+      context: .
+      target: boot
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  mysql-data:
+    name: personal-blog-mysql
+  uploads:
+    name: personal-blog-uploads
+  caddy-data:
+    name: personal-blog-caddy-data
+  caddy-config:
+    name: personal-blog-caddy-config

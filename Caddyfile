@@ -1,0 +1,30 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$SITE_DOMAIN} {
+    encode gzip
+
+    header {
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+
+    # handle_path 会移除 /uploads 前缀，映射到 /srv/uploads/<文件名>。
+    handle_path /uploads/* {
+        root * /srv/uploads
+        file_server
+    }
+
+    handle /api/* {
+        reverse_proxy app:8080
+    }
+
+    # React Router history fallback。
+    handle {
+        root * /srv/dist
+        try_files {path} /index.html
+        file_server
+    }
+}

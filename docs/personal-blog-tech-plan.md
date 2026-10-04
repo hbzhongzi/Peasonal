@@ -306,8 +306,8 @@ blog/
 ├── go.mod
 ├── Makefile                        # 统一入口：make dev / test / build / migrate / css
 ├── sqlc.yaml                       # engine: mysql, sql_package: database/sql
-├── docker-compose.yml              # 本地 mysql 8.0（M5 暂缓，尚未创建）
-├── Dockerfile                      # 多阶段构建前端 + 后端（M5 暂缓，尚未创建）
+├── docker-compose.prod.yml         # 线上 MySQL + Go + Caddy Compose
+├── Dockerfile                      # 多阶段构建前端 + 后端 + Caddy
 ├── .github/workflows/ci.yml        # CI（M5 暂缓，尚未创建）
 │
 ├── cmd/
@@ -1118,5 +1118,5 @@ max_connections       = 50      # 超过就用连接池（pgbouncer）
 - **回滚**：镜像按 commit SHA 打 tag，回滚就是把 `app` 指回上一个 tag 的镜像再 `up -d`。
   ⚠️ **数据库迁移没有对应的"回滚镜像"** —— 所以凡涉及 DDL 的发布，必须先在副本演练一遍（见 §10）。
 
-> **本方案已实现为可操作文档**：完整的 Dockerfile / docker-compose.yml / Caddyfile / 备份脚本见 [`docs/deploy.md`](./deploy.md)。
+> **本方案已实现为可操作文档**：当前线上手册与配置见 [`docs/docker-production-deploy.md`](./docker-production-deploy.md)，配套 Dockerfile / `docker-compose.prod.yml` / Caddyfile 已落在仓库根目录；[`docs/deploy.md`](./deploy.md) 保留为早期方案记录。
 > **与 §291 的偏差（已如实记录）**：当前代码**未实现 `//go:embed`**，Go 不嵌入前端 dist；部署改为由 **Caddy `file_server` 直出 `web/dist`**（含 SPA history 回退），Go 只负责 `/api/*`、上传写入与健康检查。此形态无需改动任何 Go 代码即可上线，且更契合「Caddy 唯一入站口」原则。单二进制 embed 仍可作为后续可选优化。
